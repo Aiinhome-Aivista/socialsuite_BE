@@ -1,0 +1,34 @@
+# --- Web framework ---
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+gunicorn==23.0.0
+python-multipart==0.0.20
+
+# --- Database (MySQL) ---
+sqlalchemy==2.0.36
+alembic==1.14.0
+pymysql==1.1.1
+cryptography==44.0.0          # required by pymysql for auth + token encryption
+
+# --- Auth / security ---
+passlib[bcrypt]==1.7.4
+python-jose[cryptography]==3.3.0
+pydantic==2.10.4
+pydantic-settings==2.7.0
+email-validator==2.2.0
+
+# --- AI: Mistral (cloud + local) + Vector DB ---
+mistralai==1.2.5              # Mistral cloud SDK
+httpx==0.27.2               # used to talk to local Mistral (Ollama / vLLM) too
+chromadb==0.5.23             # vector DB for brand-voice / RAG
+
+# --- Scheduling (no Docker; APScheduler with a MySQL jobstore) ---
+apscheduler==3.11.0
+
+# --- Social connectors / HTTP ---
+requests==2.32.3
+requests-oauthlib==2.0.0
+tenacity==9.0.0              # retry logic for flaky social APIs
+
+# --- Utils ---
+python-dotenv==1.0.1

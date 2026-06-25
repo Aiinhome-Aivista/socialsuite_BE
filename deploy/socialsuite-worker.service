@@ -1,0 +1,15 @@
+# /etc/systemd/system/socialsuite-worker.service
+[Unit]
+Description=Social Suite Scheduler Worker
+After=network.target mysql.service
+
+[Service]
+User=www-data
+WorkingDirectory=/var/www/social-suite/backend
+Environment="PATH=/var/www/social-suite/backend/.venv/bin"
+ExecStart=/var/www/social-suite/backend/.venv/bin/python -m app.worker
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
