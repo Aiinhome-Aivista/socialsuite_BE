@@ -47,13 +47,13 @@ def _ensure_fresh_token(db: Session, account: SocialAccount, connector) -> str:
 
 
 def _publish_target(db: Session, target: PostTarget, post: Post) -> None:
-    account = db.get(SocialAccount, target.social_account_id)
-    connector = get_connector(target.platform.value)
-    token = _ensure_fresh_token(db, account, connector)
-
     target.status = TargetStatus.publishing
     db.commit()
     try:
+        account = db.get(SocialAccount, target.social_account_id)
+        connector = get_connector(target.platform.value)
+        token = _ensure_fresh_token(db, account, connector)
+
         external_id = connector.publish(
             access_token=token,
             external_id=account.external_id,

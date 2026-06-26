@@ -41,6 +41,15 @@ class IdeasIn(BaseModel):
     n: int = 5
 
 
+class AnalysisIn(BaseModel):
+    platform: str
+    followers: int = 0
+    likes: int = 0
+    impressions: int = 0
+    watch_time_seconds: int = 0
+    demographics: dict = {}
+
+
 # ---- Posts ----
 class TargetIn(BaseModel):
     social_account_id: int

@@ -20,7 +20,7 @@ from app.database import get_db
 from app.core.deps import get_current_user
 from app.core.security import encrypt_token
 from app.core.pkce import generate_pkce_pair, random_state
-from app.models import User, SocialAccount, Platform, AccountStatus, OAuthState
+from app.models import User, SocialAccount, Platform, AccountStatus, OAuthState, PostTarget, AnalyticsSnapshot
 from app.schemas.api import ConnectorOut
 from app.services.connectors.registry import get_connector
 
@@ -138,6 +138,13 @@ def disconnect(
     acc = db.get(SocialAccount, account_id)
     if not acc:
         raise HTTPException(status_code=404, detail="Account not found")
+
+    # Delete referencing post targets and analytics snapshots to avoid FK constraint failures
+    for t in db.query(PostTarget).filter(PostTarget.social_account_id == account_id).all():
+        db.delete(t)
+    for s in db.query(AnalyticsSnapshot).filter(AnalyticsSnapshot.social_account_id == account_id).all():
+        db.delete(s)
+
     db.delete(acc)
     db.commit()
     return {"ok": True}

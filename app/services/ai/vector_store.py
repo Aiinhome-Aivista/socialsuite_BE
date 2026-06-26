@@ -11,9 +11,13 @@ can swap in Mistral embeddings (mistral-embed) via a custom embedding fn.
 from __future__ import annotations
 
 import chromadb
+from chromadb.config import Settings
 from app.config import settings
 
-_client = chromadb.PersistentClient(path=settings.CHROMA_PERSIST_DIR)
+_client = chromadb.PersistentClient(
+    path=settings.CHROMA_PERSIST_DIR,
+    settings=Settings(anonymized_telemetry=False)
+)
 
 
 def _collection(org_id: int):

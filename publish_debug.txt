@@ -18,3 +18,8 @@ Entering publish_post for 7
 Entering publish_post for 8
 Entering publish_post for 1
 Entering publish_post for 2
+Entering publish_post for 21
+Entering publish_post for 22
+Entering publish_post for 23
+Entering publish_post for 24
+Entering publish_post for 25
