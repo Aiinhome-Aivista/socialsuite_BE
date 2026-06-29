@@ -8,7 +8,7 @@ from app.database import get_db
 from app.core.deps import get_current_user, require_role
 from app.models import (
     User, SocialAccount, AnalyticsSnapshot, Post, Approval,
-    ApprovalStatus, PostStatus, Role,
+    ApprovalStatus, PostStatus, Role, PostTarget, TargetStatus,
 )
 
 router = APIRouter(tags=["analytics-approvals"])
@@ -67,6 +67,14 @@ def analytics_summary(
                 print(f"Failed to fetch metrics for {a.platform.value} account {a.id}: {e}")
 
         if latest:
+            posts_count = (
+                db.query(func.count(PostTarget.id))
+                .filter(
+                    PostTarget.social_account_id == a.id,
+                    PostTarget.status == TargetStatus.published,
+                )
+                .scalar()
+            )
             per_account.append({
                 "account_id": a.id,
                 "platform": a.platform.value,
@@ -76,6 +84,7 @@ def analytics_summary(
                 "impressions": latest.impressions,
                 "watch_time_seconds": latest.watch_time_seconds,
                 "demographics": latest.demographics,
+                "posts_count": posts_count,
             })
             for k in totals:
                 totals[k] += getattr(latest, k)
