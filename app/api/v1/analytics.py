@@ -68,8 +68,10 @@ def analytics_summary(
 
         posts_count = (
             db.query(func.count(PostTarget.id))
+            .join(Post, Post.id == PostTarget.post_id)
             .filter(
-                PostTarget.social_account_id == a.id,
+                Post.organization_id == org_id,
+                PostTarget.platform == a.platform,
                 PostTarget.status == TargetStatus.published,
             )
             .scalar()
