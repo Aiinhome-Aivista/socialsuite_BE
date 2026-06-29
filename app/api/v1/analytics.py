@@ -66,26 +66,28 @@ def analytics_summary(
                 # In production, we'd log this properly
                 print(f"Failed to fetch metrics for {a.platform.value} account {a.id}: {e}")
 
-        if latest:
-            posts_count = (
-                db.query(func.count(PostTarget.id))
-                .filter(
-                    PostTarget.social_account_id == a.id,
-                    PostTarget.status == TargetStatus.published,
-                )
-                .scalar()
+        posts_count = (
+            db.query(func.count(PostTarget.id))
+            .filter(
+                PostTarget.social_account_id == a.id,
+                PostTarget.status == TargetStatus.published,
             )
-            per_account.append({
-                "account_id": a.id,
-                "platform": a.platform.value,
-                "display_name": a.display_name,
-                "followers": latest.followers,
-                "likes": latest.likes,
-                "impressions": latest.impressions,
-                "watch_time_seconds": latest.watch_time_seconds,
-                "demographics": latest.demographics,
-                "posts_count": posts_count,
-            })
+            .scalar()
+        )
+
+        per_account.append({
+            "account_id": a.id,
+            "platform": a.platform.value,
+            "display_name": a.display_name,
+            "followers": latest.followers if latest else 0,
+            "likes": latest.likes if latest else 0,
+            "impressions": latest.impressions if latest else 0,
+            "watch_time_seconds": latest.watch_time_seconds if latest else 0,
+            "demographics": latest.demographics if latest else {},
+            "posts_count": posts_count,
+        })
+        
+        if latest:
             for k in totals:
                 totals[k] += getattr(latest, k)
                 
