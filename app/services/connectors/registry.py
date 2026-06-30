@@ -10,6 +10,7 @@ from app.services.connectors.linkedin import LinkedInConnector
 from app.services.connectors.x import XConnector
 from app.services.connectors.youtube import YouTubeConnector
 from app.services.connectors.pinterest import PinterestConnector
+from app.services.connectors.google_analytics import GoogleAnalyticsConnector
 
 
 class _NotImplementedConnector(BaseConnector):
@@ -33,6 +34,7 @@ _REGISTRY: dict[str, BaseConnector] = {
     "x": XConnector(),
     "youtube": YouTubeConnector(),
     "pinterest": PinterestConnector(),
+    "google_analytics": GoogleAnalyticsConnector(),
 }
 
 

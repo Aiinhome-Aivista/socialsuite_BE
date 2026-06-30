@@ -8,6 +8,7 @@ class Platform(str, enum.Enum):
     x = "x"
     youtube = "youtube"
     pinterest = "pinterest"
+    google_analytics = "google_analytics"
 
 
 class Role(str, enum.Enum):

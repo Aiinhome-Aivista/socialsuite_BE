@@ -64,12 +64,16 @@ def callback(platform: str, code: str, state: str, db: Session = Depends(get_db)
         token = connector.exchange_code(code, code_verifier)
         accounts = connector.fetch_accounts(token)
     except Exception as e:
+        import traceback
+        print(f"[OAUTH ERROR] Failed to connect platform {platform}: {e}")
+        traceback.print_exc()
         db.delete(st)
         db.commit()
         frontend_url = settings.FRONTEND_ORIGIN.split(",")[0].strip()
         return RedirectResponse(url=f"{frontend_url}/connectors?error=oauth_failed", status_code=302)
     
     if not accounts:
+        print(f"[OAUTH WARNING] Platform {platform} returned no accounts.")
         db.delete(st)
         db.commit()
         frontend_url = settings.FRONTEND_ORIGIN.split(",")[0].strip()
