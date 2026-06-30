@@ -75,21 +75,6 @@ def publish_now(
     return post
 
 
-@router.patch("/{post_id}/reschedule", response_model=PostOut)
-def reschedule(
-    post_id: int,
-    scheduled_at: datetime,
-    user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
-    """Used by the drag-and-drop calendar."""
-    post = db.get(Post, post_id)
-    if not post:
-        raise HTTPException(status_code=404, detail="Post not found")
-    post.scheduled_at = scheduled_at
-    post.status = PostStatus.scheduled
-    db.commit()
-    schedule_post(post.id, scheduled_at)
 @router.get("/debug_posts")
 def debug_posts(db: Session = Depends(get_db)):
     posts = db.query(Post).order_by(Post.id.desc()).limit(10).all()
@@ -103,3 +88,26 @@ def debug_posts(db: Session = Depends(get_db)):
 def debug_trigger(db: Session = Depends(get_db)):
     publish_post(8)
     return {"status": "triggered"}
+
+
+@router.delete("/{post_id}")
+def delete_post(
+    post_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    post = db.get(Post, post_id)
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    
+    if post.status != PostStatus.scheduled:
+        raise HTTPException(status_code=400, detail="Only scheduled posts can be deleted")
+        
+    if post.scheduled_at and post.scheduled_at.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
+        raise HTTPException(status_code=400, detail="Cannot delete a post whose scheduled time has passed")
+
+    cancel_scheduled_post(post.id)
+    db.delete(post)
+    db.commit()
+    return {"status": "deleted"}
+
