@@ -51,7 +51,8 @@ def google_login(payload: GoogleLoginIn, db: Session = Depends(get_db)):
         idinfo = id_token.verify_oauth2_token(
             payload.credential, 
             google_requests.Request(), 
-            settings.GOOGLE_CLIENT_ID
+            settings.GOOGLE_CLIENT_ID,
+            clock_skew_in_seconds=10
         )
     except Exception as e:
         raise HTTPException(status_code=401, detail=f"Invalid Google token: {e}")
