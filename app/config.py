@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     FRONTEND_ORIGIN: str = "http://localhost:3000"
     TOKEN_ENCRYPTION_KEY: str = "a-tjvhqi2i9EgHK-Jk0yGK_nbv05i15vQ1WlOVz2LXY="
+    GOOGLE_CLIENT_ID: str = ""
 
     # MySQL
     DB_HOST: str = "127.0.0.1"
