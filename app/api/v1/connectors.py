@@ -50,12 +50,26 @@ def authorize(
 
 
 @router.get("/{platform}/callback")
-def callback(platform: str, code: str, state: str, db: Session = Depends(get_db)):
+def callback(
+    platform: str,
+    state: str,
+    code: str | None = None,
+    error: str | None = None,
+    error_description: str | None = None,
+    db: Session = Depends(get_db),
+):
     st = db.query(OAuthState).filter(OAuthState.state == state).first()
+    frontend_url = settings.FRONTEND_ORIGIN.split(",")[0].strip()
+
     if not st or st.platform != platform:
-        frontend_url = settings.FRONTEND_ORIGIN.split(",")[0].strip()
         # Browser might double-request due to devtools/prefetch. Redirect gracefully.
         return RedirectResponse(url=f"{frontend_url}/connectors?connected={platform}", status_code=302)
+        
+    if error or not code:
+        db.delete(st)
+        db.commit()
+        return RedirectResponse(url=f"{frontend_url}/connectors?error={error or 'missing_code'}", status_code=302)
+
     org_id = st.organization_id
     code_verifier = st.code_verifier
 
@@ -69,14 +83,12 @@ def callback(platform: str, code: str, state: str, db: Session = Depends(get_db)
         traceback.print_exc()
         db.delete(st)
         db.commit()
-        frontend_url = settings.FRONTEND_ORIGIN.split(",")[0].strip()
         return RedirectResponse(url=f"{frontend_url}/connectors?error=oauth_failed", status_code=302)
     
     if not accounts:
         print(f"[OAUTH WARNING] Platform {platform} returned no accounts.")
         db.delete(st)
         db.commit()
-        frontend_url = settings.FRONTEND_ORIGIN.split(",")[0].strip()
         return RedirectResponse(url=f"{frontend_url}/connectors?error=no_account_found", status_code=302)
 
     for acc in accounts:
